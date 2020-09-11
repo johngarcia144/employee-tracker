@@ -47,25 +47,16 @@ function runSearch() {
           byDepartment();
         } 
         else if(answer.start === "View all employees by manager") {
-            byDepartment();
+            byManager();
           } 
           else if(answer.start === "Add employee") {
-            byDepartment();
+            addEmployee();
           } 
-          else if(answer.start === "Add Department") {
-            byDepartment();
+          else if(answer.start === "Add department") {
+            addDepartment();
           } 
           else if(answer.start === "Add role") {
-            byDepartment();
-          } 
-          else if(answer.start === "Remove Employee") {
-            byDepartment();
-          } 
-          else if(answer.start === "Update employee role") {
-            byDepartment();
-          } 
-          else if(answer.start === "Update employee manager") {
-            byDepartment();
+            byRole();
           } 
         else{
           connection.end();
