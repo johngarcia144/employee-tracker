@@ -72,3 +72,12 @@ function runSearch() {
         }
       });
   }
+
+  function readEmployees() {
+    connection.query("SELECT * FROM employee", function(err, res) {
+      if (err) throw err;
+      // Log all results of the SELECT statement
+      console.table(res);
+      connection.end();
+    });
+  }
