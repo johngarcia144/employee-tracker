@@ -42,25 +42,22 @@ function runSearch() {
         // based on their answer, either call the bid or the post functions
         switch (action) {
           case "View all employees":
-            readEmployees();
-            break;
-          case "View all employees by department":
-          byDepartment();
+        readEmployees();
             break;
             case "View all employees by department":
-          byDepartment();
+        byDepartment();
             break;
             case "View all employees by manager":
-          byDepartment();
+        byManager();
             break;
             case "Add employee":
-          byDepartment();
+        addEmployee();
             break;
             case "Add department":
-          byDepartment();
+        addDepartment();
             break;
             case "Add role":
-          byDepartment();
+        addRole();
             break;
           default:
             console.log("Command not found.")
@@ -76,5 +73,13 @@ function runSearch() {
       runSearch();
     });
   }
+  
+  function byDepartment() {
+    var query = connection.query("SELECT employee.id, employee.first_name, employee.last_name, department.name FROM employee LEFT JOIN role on employee.role_id = role.id LEFT JOIN department department on role.department_id = department.id WHERE department.id;",
+        function (error, department) {
+            if (error) throw error
+            console.table(query)
+        })
+};
 
   runSearch();
