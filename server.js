@@ -31,6 +31,7 @@ function runSearch() {
             message: "What would you like to do?",
             choices: [
                 "View all employees",
+                "View all roles",
                 "View all employees by department",
                 "View all employees by manager",
                 "Add employee",
@@ -44,6 +45,9 @@ function runSearch() {
           case "View all employees":
         readEmployees();
             break;
+            case "View all roles":
+                readRole();
+                    break;
             case "View all employees by department":
         byDepartment();
             break;
@@ -67,6 +71,15 @@ function runSearch() {
 
   function readEmployees() {
     var query = connection.query("SELECT * FROM employee", function(err, res) {
+      if (err) throw err;
+      // Log all results of the SELECT statement
+      console.table(res);
+      runSearch();
+    });
+  }
+
+  function readRole() {
+    var query = connection.query("SELECT * FROM role", function(err, res) {
       if (err) throw err;
       // Log all results of the SELECT statement
       console.table(res);
@@ -104,12 +117,12 @@ function addEmployee() {
           name: "eeLastName"
         },
         {
-          type: "input",
+          type: "number",
           message: "What is the employee's role id number?",
           name: "roleID"
         },
         {
-          type: "input",
+          type: "number",
           message: "What is the manager id number?",
           name: "managerID"
         }
@@ -118,6 +131,7 @@ function addEmployee() {
          connection.query("INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)", [answer.eeFirstName, answer.eeLastName, answer.roleID, answer.managerID], function(err, res) {
           if (err) throw err;
           console.table(res);
+          console.log("You have successfully added a new employee")
           runSearch();
         });
       });
