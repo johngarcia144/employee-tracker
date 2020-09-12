@@ -88,18 +88,19 @@ function runSearch() {
   }
   
   function byDepartment() {
-    var query = connection.query("SELECT employee.id, employee.first_name, employee.last_name, department.name FROM employee LEFT JOIN role on employee.role_id = role.id LEFT JOIN department department on role.department_id = department.id WHERE department.id;",
-        function (error, department) {
+    var query = connection.query("SELECT employee.id, employee.first_name, employee.last_name, department.name FROM employee LEFT JOIN role on employee.role_id = role.id LEFT JOIN department department on role.department_id = department.id WHERE department.id;",        function (error, department) {
             if (error) throw error
             console.table(query)
+            runSearch();
         })
 };
 
 function byManager() {
-    var manager = connection.query("SELECT employee.id, employee.first_name, employee.last_name, department.name, employee.manager_id AS department, role.title FROM employee LEFT JOIN role on role.id = employee.role_id LEFT JOIN department ON department.id = role.department_id WHERE manager_id;",
+    var query = connection.query("SELECT employee.id, employee.first_name, employee.last_name, department.name, employee.manager_id AS department, role.title FROM employee LEFT JOIN role on role.id = employee.role_id LEFT JOIN department ON department.id = role.department_id WHERE manager_id;",
         function (error, manager) {
             if (error) throw error
-            console.table(manager)
+            console.table(query)
+            runSearch();
         })
 };
 
@@ -128,9 +129,9 @@ function addEmployee() {
         }
       ])
       .then(function(answer) {
-         connection.query("INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)", [answer.eeFirstName, answer.eeLastName, answer.roleID, answer.managerID], function(err, res) {
+         var query = connection.query("INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)", [answer.eeFirstName, answer.eeLastName, answer.roleID, answer.managerID], function(err, res) {
           if (err) throw err;
-          console.table(res);
+          console.table(query);
           console.log("You have successfully added a new employee")
           runSearch();
         });
