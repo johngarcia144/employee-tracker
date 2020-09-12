@@ -32,7 +32,7 @@ function runSearch() {
             choices: [
                 "View all employees",
                 "View all roles",
-                "View all employees by department",
+                "View all departments",
                 "View all employees by manager",
                 "Add employee",
                 "Add department",
@@ -46,10 +46,10 @@ function runSearch() {
         readEmployees();
             break;
             case "View all roles":
-                readRole();
-                    break;
-            case "View all employees by department":
-        byDepartment();
+        readRole();
+            break;
+            case "View all departments":
+        readDepartment();
             break;
             case "View all employees by manager":
         byManager();
@@ -81,25 +81,25 @@ function runSearch() {
   function readRole() {
     var query = connection.query("SELECT * FROM role", function(err, res) {
       if (err) throw err;
-      // Log all results of the SELECT statement
+
       console.table(res);
       runSearch();
     });
   }
   
-  function byDepartment() {
-    var query = connection.query("SELECT employee.id, employee.first_name, employee.last_name, department.name FROM employee LEFT JOIN role on employee.role_id = role.id LEFT JOIN department department on role.department_id = department.id WHERE department.id;",        function (error, department) {
+  function readDepartment() {
+    var query = connection.query("Select * FROM department", function (error, res) {
             if (error) throw error
-            console.table(query)
+            console.table(res)
             runSearch();
         })
 };
 
 function byManager() {
-    var query = connection.query("SELECT employee.id, employee.first_name, employee.last_name, department.name, employee.manager_id AS department, role.title FROM employee LEFT JOIN role on role.id = employee.role_id LEFT JOIN department ON department.id = role.department_id WHERE manager_id;",
+    var results = connection.query("SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name AS department, role.salary, CONCAT(manager.first_name, ' ', manager.last_name) AS manager FROM employee LEFT JOIN role on employee.role_id = role.id LEFT JOIN department on role.department_id = department.id LEFT JOIN employee manager on manager.id = employee.manager_id;",
         function (error, manager) {
             if (error) throw error
-            console.table(query)
+            console.table(results)
             runSearch();
         })
 };
