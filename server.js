@@ -33,11 +33,11 @@ function runSearch() {
                 "View all employees",
                 "View all roles",
                 "View all departments",
-                "View all employees by manager",
                 "Add employee",
                 "Add department",
                 "Add role",
                 "Update employee role",
+                "View employees by manager"
             ]})
       .then(function({action}) {
         // based on their answer, either call the bid or the post functions
@@ -51,9 +51,6 @@ function runSearch() {
             case "View all departments":
         readDepartment();
             break;
-            case "View all employees by manager":
-        byManager();
-            break;
             case "Add employee":
         addEmployee();
             break;
@@ -62,6 +59,12 @@ function runSearch() {
             break;
             case "Add role":
         addRole();
+            break;
+            case "Update employee role":
+        updateRole();
+            break;
+            case "View employees by manager":
+        byManager();
             break;
           default:
             console.log("Command not found.")
@@ -96,10 +99,10 @@ function runSearch() {
 };
 
 function byManager() {
-    var results = connection.query("SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name AS department, role.salary, CONCAT(manager.first_name, ' ', manager.last_name) AS manager FROM employee LEFT JOIN role on employee.role_id = role.id LEFT JOIN department on role.department_id = department.id LEFT JOIN employee manager on manager.id = employee.manager_id;",
-        function (error, manager) {
+    var query = connection.query("SELECT employee.id, employee.first_name, employee.last_name, department.name, employee.manager_id AS department, role.title FROM employee LEFT JOIN role on role.id = employee.role_id LEFT JOIN department ON department.id = role.department_id WHERE manager_id;",
+        function (error, res) {
             if (error) throw error
-            console.table(results)
+            console.table(res)
             runSearch();
         })
 };
@@ -131,11 +134,84 @@ function addEmployee() {
       .then(function(answer) {
          var query = connection.query("INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)", [answer.eeFirstName, answer.eeLastName, answer.roleID, answer.managerID], function(err, res) {
           if (err) throw err;
-          console.table(query);
-          console.log("You have successfully added a new employee")
+          console.log("You have successfully added", answer.eeFirstName + " " + answer.eeLastName,"as anew employee")
           runSearch();
         });
       });
   }
+
+  function addRole() {
+    inquirer
+      .prompt([
+        {
+          type: "input",
+          message: "What's the title of the new role?",
+          name: "newRole"
+        },
+        {
+          type: "number",
+          message: "What's the salary of the new role?",
+          name: "newSalary"
+        },
+        {
+          type: "number",
+          message: "What is the department ID of the new role?",
+          name: "deptID"
+        }
+      ])
+      .then(function(answer) {
+         var query = connection.query("INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?)", [answer.newRole, answer.newSalary, answer.deptID], function(err, res) {
+          if (err) throw err;
+          console.log("You have successfully added", answer.newRole,"as a new role")
+          runSearch();
+        });
+      });
+  }
+
+  function addDepartment() {
+    inquirer
+      .prompt([
+        {
+          type: "input",
+          message: "What's the first name of the new department?",
+          name: "newDept"
+        }
+      ])
+      .then(function(answer) {
+         var query = connection.query("INSERT INTO department (name) VALUES (?)", [answer.newDept], function(err, res) {
+          if (err) throw err;
+          console.log("You have successfully added", answer.newDept,"as a new department")
+          runSearch();
+        });
+      });
+  }
+
+//   function employeeList() {
+//     var query = "SELECT id FROM employee";
+//     connection.query(query, function(err, res) {
+//       for (var i = 0; i < res.length; i++) {
+//         console.log(res[i].id);
+//       }
+//       runSearch();
+//     });
+//   }
+
+//   function updateRole() {
+//     inquirer
+//         .prompt({
+//             name: "update",
+//             type: "list",
+//             message: "Choose an employee to update",
+//             choices: [
+//                 "View all employees",
+//                 "View all roles",
+//                 "View all departments",
+//                 "Add employee",
+//                 "Add department",
+//                 "Add role",
+//                 "Update employee role",
+//             ]})
+      
+
 
   runSearch();
