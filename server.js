@@ -73,7 +73,7 @@ function runSearch() {
   }
 
   function readEmployees() {
-    var query = connection.query("SELECT * FROM employee", function(err, res) {
+    var query = connection.query("SELECT first_name, last_name, role.title, role.salary FROM employee INNER JOIN role ON employee.role_id = role.department_id", function(err, res) {
       if (err) throw err;
       // Log all results of the SELECT statement
       console.table(res);
@@ -196,22 +196,81 @@ function addEmployee() {
 //     });
 //   }
 
-//   function updateRole() {
-//     inquirer
-//         .prompt({
-//             name: "update",
-//             type: "list",
-//             message: "Choose an employee to update",
-//             choices: [
-//                 "View all employees",
-//                 "View all roles",
-//                 "View all departments",
-//                 "Add employee",
-//                 "Add department",
-//                 "Add role",
-//                 "Update employee role",
-//             ]})
+  function updateRole() {
+      
+    connection.query('SELECT first_name, last_name, id from employee', function(err, res) {
+      // console.table(res);
+      if (err) throw err;
+      const employee = res
+      const employeeArr = []
+      for (var i = 0; i < employee.length; i++) {
+      //this loop variable will store both the name and the id, the id is how we will capture and delete the row while the name will be used in the inquirer prompt
+      const loop = {
+          name:(res[i].first_name + ' ' + res[i].last_name),
+          value: res[i].id
+          }
+      employeeArr.push(loop);
+      }
+      connection.query('SELECT title, department_id from role', function(err, res) {
+          // console.table(res);
+          if (err) throw err;
+          const role = res
+          const roleArr = []
+          for (var i = 0; i < role.length; i++) {
+          //this loop variable will store both the name and the id, the id is how we will capture and delete the row while the name will be used in the inquirer prompt
+          const loop2 = {
+              name: res[i].title,
+              value: res[i].department_id
+              }
+          roleArr.push(loop2);
+          }
+          connection.query('SELECT id, name from department', function(err, res) {
+              // console.table(res);
+              if (err) throw err;
+              const department = res
+              const departmentArr = []
+              for (var i = 0; i < department.length; i++) {
+              //this loop variable will store both the department and the id, the value is what we will replace the row with while the name will be used in the inquirer prompt
+              const loop3 = {
+                  name: res[i].name,
+                  value: res[i].id
+                  }
+              departmentArr.push(loop3);
+              }
+      inquirer.prompt([
+          {
+              type: "list",
+              message: "Please choose an employee to update.",
+              choices: employeeArr,
+              name: "update"
+          },
+          {
+              type: "list",
+              message: "Please choose a role to assign.",
+              choices: roleArr,
+              name: "role"
+          },
+          {
+              type: "list",
+              message: "What department is that role in?",
+              choices: departmentArr,
+              name: "department"
+          }
+      ]).then(choice => {
+          // console.log(choice.role, choice.department, choice.update)
+              connection.query('UPDATE employee SET role_id = ' + choice.role + ' WHERE id = ' + choice.update, function(err, res) {
+              if (err) throw err;
+              else console.log("Employee Successfully Updated!");
+              runSearch();
+          })
+      })
+      })
+  })
+  })
+}
       
 
 
   runSearch();
+
+  
